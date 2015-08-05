@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Studying: {{ deck }}</title>
+
+    <link rel="stylesheet" href="../../static/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../static/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+    <script src="../../static/jquery-1.11.3.min.js"></script>
+    <script src="../../static/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/highlight/styles/default.css">
+    <style>
+        canvas { background:whitesmoke}
+    </style>
+    <script src="../../static/highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    {% if deck_exists %}
+    {%if card != None %}
+        {% if (card.card_type % 10 == 1) %}
+        <script src="../../static/canvas.js"></script>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+</head>
+
+<body>
+<div class="container">
+    <h4>Studying deck: {{ deck }}</h4>
+    {% if deck_exists %}
+        {%if card != None %}
+        <br>
+        <div class="panel panel-default">
+            {% if (card.card_type % 1000 >= 300) %}
+            <button id="front_sound_btn">
+                <img src="../../static/images/1437551412_Gnome-Audio-X-Generic-48.png">
+            </button>
+            {% endif %}
+
+            <div class="panel-heading"></div>
+            <div id="front_body" class="panel-body">{{card.front|safe}}</div>
+            
+            {% if (card.card_type % 10 == 1) %}
+                <canvas id="canvas" width='300' height='150'></canvas>
+                <button id="clear_btn">Clear</button>
+            {% endif %}
+        </div>
+
+        <button id="show_ans_btn" type="button" class="btn btn-default">
+            Show Answer
+        </button>
+
+        <div id="back_panel" class="panel panel-default hide">
+            {% if (card.card_type % 100 >= 20) %}
+            <button id="back_sound_btn">
+                <img src="../../static/images/1437551412_Gnome-Audio-X-Generic-48.png">
+            </button>
+            {% endif %}
+            <div class="panel-heading"></div>
+            <div id="back_body" class="panel-body">{{card.back|safe}}</div>
+        </div>
+
+        <button id="correct_btn" type="button" class="btn btn-default hide">
+            Correct
+        </button>
+
+        <button id="wrong_btn" type="button" class="btn btn-default hide">
+            Wrong
+        </button>
+        {%else%}
+        <div class="panel panel-default">
+            <div class="panel-heading"></div>
+            <div id="front_panel" class="panel-body">There are currently no cards to study in this deck!</div>
+        </div>
+        {%endif%}
+    {% else %}
+        No deck named {{ deck }} could be found.
+    {% endif %}
+</div>
+
+    {% if deck_exists %}
+    {%if card != None %}
+        <script>
+        var deck_name = {{card.deck_name|tojson}};
+        var card_front = {{card.front|tojson}};
+        var card_back = {{card.back|tojson}};
+        var last_studied = {{card.last_studied|tojson}};
+        var interval = {{card.interval|tojson}};
+        var sound_front = {{card.sound_front|tojson}};
+        var sound_back = {{card.sound_back|tojson}};
+
+        //Info for undos:
+        var prev_front = "";
+        var prev_back = "";
+        var prev_studied = 0;
+        var prev_interval = 0;</script>
+        <script src="../../static/study.js"></script>
+
+        {% if card.sound_front != None%}
+        {% if card.sound_front != "" %}
+        {% if (card.card_type % 1000 >= 300) %}
+        <audio id="front_audio" src="../../static/sound/{{card.sound_front}}" autoplay>
+            Your browser does not support the <code>audio</code> element.
+        </audio>
+        <script>
+            $("#front_sound_btn").click(function() {
+                console.log($("#front_audio"));
+                $("#front_audio")[0].currentTime=0;
+                $("#front_audio")[0].play();
+            });
+            
+        </script>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+
+        {% if card.sound_back != None%}
+        {% if card.sound_back != "" %}
+        {% if (card.card_type % 100 >= 20) %}
+        <audio id="back_audio" src="../../static/sound/{{card.sound_back}}">
+            Your browser does not support the <code>audio</code> element.
+        </audio>
+        <script>
+            $("#back_sound_btn").click(function() {
+                $("#back_audio")[0].currentTime=0;
+                $("#back_audio")[0].play();
+            });
+        </script>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+    {%endif%}
+    {%endif%}
+    <br>
+    <a href="../..">Back to Home</a>
+</body>
+
+</html>

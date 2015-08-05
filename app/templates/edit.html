@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Edit </title>
+
+    <link rel="stylesheet" href="../../static/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../static/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+    <script src="../../static/jquery-1.11.3.min.js"></script>
+    <script src="../../static/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+    <script src="../../static/tinymce/tinymce.min.js"></script>
+    <link rel="stylesheet" href="../../static/highlight/styles/default.css">
+    <script src="../../static/highlight/highlight.pack.js"></script>
+    <script src="../../static/edit.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Deck info: {{deck}}</h1>
+    {% if deck_exists %}
+    <br>
+        <div id="mainarea">
+        <table id="card_table" class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <td></td>
+                <td>Front</td>
+                <td>Back</td>
+                <td>Deck Name</td>
+                <td>Initially Created</td>
+                <td>Last Edited</td>
+                <td>Last Studied</td>
+                <td>Interval</td>
+                <td>Card Type</td>
+                <td>Sound (Back)</td>
+                <td>Sound (Front)</td>
+            </tr>
+            </thead>
+            {%for row in card_list%}
+            <tr>
+                <td><button id="{{loop.index}}_btn"type="button" class="btn btn-default">Edit</button></td>
+                <td id="{{loop.index}}_front">{{row["front"]}}</td>
+                <td id="{{loop.index}}_back">{{row["back"]}}</td>
+                <td>{{row["deck_name"]}}</td>
+                <td>{{row["initially_created"].strftime("%a, %m/%d/%y, %I:%M %p")}}</td>
+                <td>{{row["last_edited"].strftime("%a, %m/%d/%y, %I:%M %p")}}</td>
+                <td>{{row["last_studied"].strftime("%a, %m/%d/%y, %I:%M %p")}}</td>
+                <td id="{{loop.index}}_interval">{{row["interval"]}}</td>
+                <td id="{{loop.index}}_card_type">{{row["card_type"]}}</td>
+                <td id="{{loop.index}}_sound_back">{{row["sound_back"]}}</td>
+                <td id="{{loop.index}}_sound_front">{{row["sound_front"]}}</td>
+            </tr>
+            {%endfor%}
+        </table>
+        <button class="btn btn-default" id="new_card_btn">Add New Card</button>
+        
+        </div>
+
+        <br>
+        <div id="editarea" class="hide">
+            <br>
+            <p>Front:</p>
+            <textarea id="front_editor"></textarea>
+            <br>
+            <div class="panel panel-default">
+                <div class="panel-heading"></div>
+                <div id="front_preview" class="panel-body"></div>
+            </div>
+
+            <br>
+            <p>Back:</p>
+            <textarea id="back_editor"></textarea>
+            <br>
+            <div class="panel panel-default">
+                <div class="panel-heading"></div>
+                <div id="back_preview" class="panel-body"></div>
+            </div>
+
+            <br>
+            <div class="checkbox">
+                <label>
+                    <input id="minor_check" type="checkbox"> Minor Edit
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input id="draw_check" type="checkbox"> Drawing Area
+                </label>
+                <label>
+                    <input id="back_sound_check" type="checkbox"> Play Sound (Back)
+                </label>
+                <label>
+                    <input id="front_sound_check" type="checkbox"> Play Sound (Front)
+                </label>
+            </div>
+            <br>
+            Back Sound File:
+            <input id="back_sound_input" type="text">
+            Front Sound File:
+            <input id="front_sound_input" type="text">
+            <br>
+
+            <br>
+            <button class="btn btn-default" id="save_edit_btn">Save</button>
+            <button class="btn btn-default" id="cancel_edit_btn">Cancel</button>
+        </div>
+
+        <script>
+        //Used for ajax request...
+        var old_front;
+        var deck_name = "{{deck}}";
+        {%for row in card_list%}
+           
+            $("#{{loop.index}}_btn").click(function() {
+                var card_type = parseInt($("#{{loop.index}}_card_type").text());
+
+                if(card_type % 10 === 1) {
+                    $("#draw_check").prop("checked", true);
+                }
+                else {
+                    $("#draw_check").prop("checked", false);
+                }
+                if(card_type % 100 >= 20) {
+                    $("#back_sound_check").prop("checked", true);
+                }
+                else {
+                    $("#back_sound_check").prop("checked", false);
+                }
+                if(card_type % 1000 >= 300) {
+                    $("#front_sound_check").prop("checked", true);
+                }
+                else {
+                    $("#front_sound_check").prop("checked", false);
+                }
+
+                old_front = $("#{{loop.index}}_front").text();
+
+                tinymce.get("front_editor").setContent($("#{{loop.index}}_front").text());
+                tinymce.get("back_editor").setContent($("#{{loop.index}}_back").text());
+                $("#back_sound_input").val($("#{{loop.index}}_sound_back").text());
+                $("#front_sound_input").val($("#{{loop.index}}_sound_front").text());
+
+                $("#editarea").removeClass("hide");
+                $("#mainarea").addClass("hide");
+            });
+        {%endfor%}
+        </script>
+
+    {% else %}
+        No deck named {{ deck }} could be found.
+
+        Would you like to create one?
+    {% endif %}
+    <a href="../..">Back to Home</a>
+</div>
+</body>
+</html>
