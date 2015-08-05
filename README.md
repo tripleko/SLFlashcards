@@ -6,6 +6,7 @@ Out of the box features include:
 * Flaschards allow unrestricted HTML/CSS/Javascript.
 * Code highlighting.
 * Simple support for sound.
+* Optional drawing area (ex. for drawing kanji)
 * Easy to sync data (deck is contained in a single SQLite file).
 * Runs completely locally (no internet connection required)
 
@@ -24,5 +25,19 @@ python run_local.py
 ```
 
 The application will run on http://127.0.0.1:5000/ by default. Just head over to your browser and take a look. There is currently no web UI for deck management so you will have to add those yourself to the decks table in the data-local.sqlite3 file. Flashcard editing in existing decks works fine, but deck management is still a little bit hacky at the moment.
+
+##Screenshots
+
+Main menu:
+
+![Main Menu](docs/screenshots/main_menu.png?raw=true)
+
+Easy to practice drawing chinese characters:
+
+![Study](docs/screenshots/study.png?raw=true)
+
+Code highlighting:
+
+![Highlighting](docs/screenshots/highlight.png?raw=true)
 
 If you find that this application doesn't suit your needs but you are still interested in spaced repetition, I highly recommend <a src="http://ankisrs.net/">Anki</a>, a much more mature and user-friendly project than what I have right now.
