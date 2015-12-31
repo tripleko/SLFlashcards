@@ -1,6 +1,6 @@
 var minor_edit = false;
 
-//TODO: Flashcard deletetion needs to be eaiser.
+//TODO: Flashcard deletion needs to be easier.
 
 $(function() {
     tinymce.init({

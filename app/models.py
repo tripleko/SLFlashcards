@@ -16,6 +16,7 @@ class Flashcard(db.Model):
     front = db.Column(db.String, primary_key=True)
     back = db.Column(db.String)
     deck_name = db.Column(db.String, db.ForeignKey(Deck.deck_name), nullable=False)
+    #TODO: These next two columns are not very useful at the moment. Clean up.
     initially_created = db.Column(db.DateTime, nullable=False)
     last_edited = db.Column(db.DateTime, nullable=False)
     last_studied = db.Column(db.DateTime, nullable=False)

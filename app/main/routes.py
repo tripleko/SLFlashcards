@@ -6,7 +6,7 @@ import json
 
 from datetime import datetime, timedelta
 
-#TODO, move helper functions unrelated to the routes to a seperate file.
+#TODO, move helper functions unrelated to the routes to a separate file.
 
 #Returns the next card to be studied in a deck, or None.
 def getNextCard(deck):
@@ -63,7 +63,7 @@ def countToStudy(deck):
 
     return count
 
-@main.route('/')
+@main.route("/")
 def index():
     deck_all = Deck.query.all()
     deck_list = []
@@ -80,16 +80,13 @@ def index():
                 "priority_count": priority_count}
         deck_list.append(temp)
 
-
-    print(deck_list)
-
-    return render_template('index.html', deck_list=deck_list)
+    return render_template("index.html", deck_list=deck_list)
 
 #Used to edit existing cards or add a new one.
-@main.route('/ajax/editcard', methods=['POST'])
+@main.route("/ajax/editcard", methods=["POST"])
 def ajax_editcard():
     data_dict = request.get_json()
-    print(data_dict)
+    #print(data_dict)
 
     return_dict = {"error": False}
 
@@ -143,7 +140,7 @@ def ajax_editcard():
     return jsonify(return_dict)
 
 #Used by the study page to update intervals only.
-@main.route('/ajax/updatecard', methods=['POST'])
+@main.route("/ajax/updatecard", methods=["POST"])
 def ajax_updatecard():
     data_dict = request.get_json()
     edit_card = Flashcard.query.filter_by(front=data_dict["front"]).first()
@@ -164,14 +161,15 @@ def ajax_updatecard():
         "card_back": card.back,
         "last_studied": card.last_studied,
         "interval": card.interval}
-    
+
     #NEGATIVE value interval indicates there is no card to return.
     else:
         return_dict = {"interval": -1}
 
     return jsonify(**return_dict)
 
-@main.route('/study/<deck>/')
+
+@main.route("/study/<deck>/")
 def study(deck):
     deck_exists = False
     deck_total_cards = 0
@@ -181,13 +179,12 @@ def study(deck):
 
     card = getNextCard(deck)
 
-    return render_template('study.html', deck=deck,
+    return render_template("study.html", deck=deck,
                             deck_total_cards=deck_total_cards,
                             deck_exists=deck_exists, card=card)
 
 
-#TODO: In progress, may need to re-do structure..
-@main.route('/edit/<deck>/')
+@main.route("/edit/<deck>/")
 def edit(deck):
     deck_exists=False
 
@@ -210,4 +207,96 @@ def edit(deck):
 
             card_list.append(temp)
 
-    return render_template('edit.html', deck=deck, deck_exists=deck_exists, card_list=card_list)
+    return render_template("edit.html", deck=deck, deck_exists=deck_exists, card_list=card_list)
+
+#TODO: This is a temporary route. Should combine functionality into one edit route later.
+@main.route("/ajax/intervaledit", methods=["POST"])
+def intervaldb():
+    if len(request.json) <= 0:
+        return "Failure. No cards found."
+
+    card_query = Flashcard.query.filter_by(deck_name=request.json[0]["deck"])
+
+    for row in request.json:
+        edit_row = card_query.filter_by(front=row["front"]).first()
+        if edit_row is None:
+            continue
+        if row["to_delete"]:
+            db.session.delete(edit_row)
+        else:
+            edit_row.interval = row["interval"]
+
+    db.session.commit()
+
+    return "Success"
+
+
+#TODO: This is a temporary route. Should combine functionality into one edit route later.
+#Since I'm basically the only user of this right now, I'm rolling with this somewhat half-assed solution.
+@main.route("/intervaledit/<deck>/")
+def intervaledit(deck):
+    card_list = []
+
+    deck_exists=False
+
+    if Deck.query.filter_by(deck_name=deck).first() is not None:
+        deck_exists=True
+
+        card_all = Flashcard.query.filter_by(deck_name=deck).all()
+        card_list = []
+        for row in card_all:
+            temp = {"interval": row.interval,
+                    "front": row.front,
+                    "back": row.back,
+                    "last_studied": row.last_studied}
+
+            card_list.append(temp)
+
+    return render_template("intervaledit.html", deck_exists=deck_exists, card_list=card_list, deck=deck)
+
+
+@main.route("/ajax/editdeck", methods=["POST"])
+def editdb():
+    for row in request.json:
+        if row["deck_name"].strip() == "":
+            continue
+
+        #Indicates this is a new deck.
+        if row["orig_name"].strip() == "":
+            #Check if it's up for deletion before doing anything else.
+            if row["to_delete"] == True:
+                continue
+            else:
+                db.session.add(Deck(deck_name=row["deck_name"], deck_tier=row["deck_tier"]))
+                continue
+
+        edit_row = Deck.query.filter_by(deck_name=row["orig_name"]).first()
+
+        #Only allow deletes on empty decks for now.
+        if row["to_delete"] == True:
+            if Flashcard.query.filter_by(deck_name=row["orig_name"]).count() == 0:
+                db.session.delete(edit_row)
+
+        else:
+            fc = Flashcard.query.filter_by(deck_name=row["orig_name"]).all()
+
+            for card in fc:
+                card.deck_name = row["deck_name"]
+
+            edit_row.deck_name = row["deck_name"]
+            edit_row.deck_tier = row["deck_tier"]
+
+    db.session.commit()
+    return "Success"
+
+
+@main.route("/managedecks")
+def managedecks():
+    deck_list = []
+    for row in Deck.query.all():
+        temp = {"deck_tier": row.deck_tier,
+                "deck_name": row.deck_name,
+                "total_count": Flashcard.query.filter_by(deck_name=row.deck_name).count()}
+        deck_list.append(temp)
+
+    return render_template("managedecks.html", deck_list=deck_list)

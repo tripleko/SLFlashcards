@@ -1,99 +1,109 @@
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends "base.html" %}
+{% block title %}Start Page{% endblock %}
 
-    <title>Start Page</title>
 
-    <link rel="stylesheet" href="../../static/bootstrap-3.3.5-dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../static/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
-    <script src="../../static/jquery-1.11.3.min.js"></script>
-    <script src="../../static/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
-</head>
+{% block scripts %}
 
-<body>
-<div class="container">
+<link rel="stylesheet" href="static/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="static/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+<script src="static/jquery-1.11.3.min.js"></script>
+<script src="static/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script src="static/knockout-3.4.0.js"></script>
 
-    <br>
-    <hr>
+{% endblock %}
 
-    <h1>High Priority Decks: </h1>
-    <table class="table table-striped table-bordered">
-    <thead>
-    <tr>
-        <td>Deck Name</td>
-        <td>Total Cards</td>
-        <td>To Study</td>
-        <td>0 to 2 Interval (Priority Today)
-        <td></td>
-    </tr>
-    </thead>
-    {% for row in deck_list %}
-    {% if row["deck_tier"] == 0 %}
+
+{% block container %}
+<br>
+<a href="/managedecks">Manage Decks</a>
+<br>
+<hr>
+
+<h1>High Priority Decks: </h1>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+    <td>Deck Name</td>
+    <td>Total Cards</td>
+    <td>To Study</td>
+    <td>0 to 2 Interval (Priority Today)
+    <td></td>
+    <td></td>
+</tr>
+</thead>
+{% for row in deck_list %}
+{% if row["deck_tier"] == 0 %}
+<tr>
+    <td><a href="/study/{{row["deck_name"]}}">{{row["deck_name"]}}</a></td>
+    <td>{{row["total_count"]}}</td>
+    <td><b>{{row["to_study_count"]}}</b></td>
+    <td><b>{{row["priority_count"]}}</b></td>
+    <td><a href="/edit/{{row["deck_name"]}}">Edit {{row["deck_name"]}}</a></td>
+    <td><a href="/intervaledit/{{row["deck_name"]}}">Delete/Interval {{row["deck_name"]}}</a></td>
+</tr>
+{% endif %}
+{% endfor %}
+</table>
+
+<br>
+<hr>
+<br>
+
+<h2>Lower Priority Decks: </h2>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+    <td>Deck Name</td>
+    <td>Total Cards</td>
+    <td>To Study</td>
+    <td>0 to 2 Interval (Priority Today)
+    <td></td>
+    <td></td>
+</tr>
+</thead>
+{% for row in deck_list %}
+    {% if row["deck_tier"] == 1 %}
     <tr>
         <td><a href="/study/{{row["deck_name"]}}">{{row["deck_name"]}}</a></td>
         <td>{{row["total_count"]}}</td>
         <td><b>{{row["to_study_count"]}}</b></td>
         <td><b>{{row["priority_count"]}}</b></td>
         <td><a href="/edit/{{row["deck_name"]}}">Edit {{row["deck_name"]}}</a></td>
+        <td><a href="/intervaledit/{{row["deck_name"]}}">Delete/Interval {{row["deck_name"]}}</a></td>
     </tr>
     {% endif %}
-    {% endfor %}
-    </table>
+{% endfor %}
+</table>
 
-    <br>
-    <hr>
-    <br>
+<br>
+<hr>
+<br>
 
-    <h2>Lower Priority Decks: </h2>
-    <table class="table table-striped table-bordered">
-    <thead>
-    <tr>
-        <td>Deck Name</td>
-        <td>Total Cards</td>
-        <td>To Study</td>
-        <td></td>
-    </tr>
-    </thead>
-    {% for row in deck_list %}
-    {% if row["deck_tier"] == 1 %}
-    <tr>
-        <td><a href="/study/{{row["deck_name"]}}">{{row["deck_name"]}}</a></td>
-        <td>{{row["total_count"]}}</td>
-        <td>{{row["to_study_count"]}}</td>
-        <td><a href="/edit/{{row["deck_name"]}}">Edit {{row["deck_name"]}}</a></td>
-    </tr>
-    {% endif %}
-    {% endfor %}
-    </table>
-
-    <br>
-    <hr>
-    <br>
-
-    <h3>Archived Decks: </h3>
-    <table class="table table-striped table-bordered">
-    <thead>
-    <tr>
-        <td>Deck Name</td>
-        <td>Total Cards</td>
-        <td>To Study</td>
-        <td></td>
-    </tr>
-    </thead>
-    {% for row in deck_list %}
+<h3>Archived Decks: </h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+    <td>Deck Name</td>
+    <td>Total Cards</td>
+    <td>To Study</td>
+    <td>0 to 2 Interval (Priority Today)
+    <td></td>
+    <td></td>
+</tr>
+</thead>
+{% for row in deck_list %}
     {% if row["deck_tier"] == 2 %}
     <tr>
         <td><a href="/study/{{row["deck_name"]}}">{{row["deck_name"]}}</a></td>
         <td>{{row["total_count"]}}</td>
-        <td>{{row["to_study_count"]}}</td>
+        <td><b>{{row["to_study_count"]}}</b></td>
+        <td><b>{{row["priority_count"]}}</b></td>
         <td><a href="/edit/{{row["deck_name"]}}">Edit {{row["deck_name"]}}</a></td>
+        <td><a href="/intervaledit/{{row["deck_name"]}}">Delete/Interval {{row["deck_name"]}}</a></td>
     </tr>
     {% endif %}
-    {% endfor %}
-    <table>
-</div>
-</body>
+{% endfor %}
+{% endblock %}
 
-</html>
+
+{% block end_body %}{% endblock %}
