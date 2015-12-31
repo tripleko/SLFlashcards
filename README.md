@@ -34,7 +34,7 @@ Main menu:
 
 ![Main Menu](docs/screenshots/main_menu.png?raw=true)
 
-Easy to practice drawing chinese characters:
+Easy to practice drawing chinese characters / kana / whatever else you want:
 
 ![Study](docs/screenshots/study.png?raw=true)
 
