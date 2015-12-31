@@ -1,4 +1,4 @@
-This is a localserver Flask application for <a src="https://en.wikipedia.org/wiki/Spaced_repetition"> spaced repetition</a> learning. Currently it is still very much a work in process and not super user friendly. Most people will prefer <a src="http://ankisrs.net/">Anki</a>, a great and mature piece of of software. This project is mostly just written for me.
+This is a localserver Flask application for [spaced repetition](https://en.wikipedia.org/wiki/Spaced_repetition) learning. Currently it is still very much a work in process and not super user friendly. Most people will prefer [Anki](http://ankisrs.net/), a great and mature piece of of software. This project is mostly just written for me.
 
 I'd been using Anki for a while, but I found myself wanting more custom features than I could easily squeeze out of it. More distressingly, I occasionally ran into a very difficult pinpoint bug with the scheduling. So I sat down, wrote this out, and have slowly been adding features as I go along.
 
