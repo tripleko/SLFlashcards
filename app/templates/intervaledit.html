@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Edit Intervals/Delete Cards{% endblock %}
+
+
+{% block scripts %}
+<link rel="stylesheet" href="../../static/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../static/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+<script src="../../static/jquery-1.11.3.min.js"></script>
+<script src="../../static/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script src="../../static/knockout-3.4.0.js"></script>
+{% endblock %}
+
+
+{% block container %}
+{% if deck_exists %}
+<br>
+<div class="row">
+    <div id="successbox" class="alert alert-success collapse">
+    <a href="#" class="close" onclick="$('#successbox').hide()" aria-label="close">&times;</a>
+    Successfully updated.
+    </div>
+</div>
+
+<h1>Deck info: {{deck}}</h1>
+
+<div class="row">
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <td>Delete?</td>
+            <td>Interval</td>
+            <td>Front</td>
+            <td>Back</td>
+            <td>Last Studied</td>
+        </tr>
+        </thead>
+
+        <tbody data-bind="foreach: card_list">
+            <tr>
+                <td><input type="checkbox" data-bind="checked: to_delete"></td>
+                <td><input data-bind="value: interval"></td>
+                <td><p data-bind="text: front"></p></td>
+                <td><p data-bind="text: back"></p></td>
+                <td><p data-bind="text: last_studied"></p></td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+<div class="row">
+
+<button class="btn btn-default" id="save_edit_btn">Save</button>
+</div>
+{% else %}
+No such deck. Check spelling.
+
+{% endif %}
+
+<br>
+<br>
+<a href="../..">Back to Home</a>
+
+{% endblock %}
+
+
+{% block end_body %}
+{% if deck_exists %}
+<script>
+    function Card(interval, front, back, last_studied) {
+        var self = this;
+        self.interval = ko.observable(interval);
+        self.front = front;
+        self.back = back;
+        self.last_studied = last_studied;
+        self.to_delete = ko.observable(false);
+        self.deck = "{{deck}}";
+    }
+
+    function ViewModel() {
+        var self = this;
+
+        self.card_list = ko.observableArray([]);
+        {% for row in card_list %}
+        self.card_list.push(new Card({{row["interval"]}},
+                `{{row["front"] | safe}}`,
+                `{{row["back"] | safe}}`,
+                "{{row["last_studied"]}}"));
+        {% endfor %}
+    }
+
+    var vm = new ViewModel();
+    ko.applyBindings(vm);
+
+    $("#save_edit_btn").click(function() {
+        var send_data = ko.toJS(vm).card_list;
+
+        $.ajax({
+            type: "POST",
+            url: "../../ajax/intervaledit",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(send_data),
+            success: function(newData) {
+                if(newData.error === true) {
+                    console.log(newData.error_msg);
+                }
+
+                //Show success and reload page after 1.5 seconds.
+                if(newData === "Success") {
+                    $("#successbox").show();
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1500);
+                }
+            },
+            error: function() {
+                alert("Something went wrong!")
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}
